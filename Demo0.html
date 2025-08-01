@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+      background: #f0f0f0;
+    }
+
+    h2 {
+      margin-bottom: 40px;
+    }
+
+    .switch-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .switch-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+  </style>
+</head>
+<body>
+  <h2>行動選擇</h2>
+  <div class="switch-group">
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch1" />
+        <span class="slider"></span>
+      </label>
+      <span>睡眠</span>
+    </div>
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch2" />
+        <span class="slider"></span>
+      </label>
+      <span>學業</span>
+    </div>
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch3" />
+        <span class="slider"></span>
+      </label>
+      <span>興趣</span>
+    </div>
+  </div>
+
+  <script>
+    const switches = {
+      goodSwitch: document.getElementById("switch1"),
+      cheapSwitch: document.getElementById("switch2"),
+      fastSwitch: document.getElementById("switch3")
+    };
+
+    let allowThree = false;
+
+    function getSelected() {
+      return Object.entries(switches)
+        .filter(([_, checkbox]) => checkbox.checked)
+        .map(([key, _]) => key);
+    }
+
+    function handleSwitchChange(changedId) {
+      const selected = getSelected();
+
+      if (selected.length > 3) return; // should never happen
+      if (selected.length === 3 && !allowThree) {
+        // Remove one of the other two at random
+        const others = selected.filter(id => id !== changedId);
+        const toDisable = others[Math.floor(Math.random() * others.length)];
+        switches[toDisable].checked = false;
+      }
+
+      if (selected.length === 3 && !allowThree) {
+        // Check for 30% chance to allow three
+        if (Math.random() < 0) {
+          allowThree = true;
+        }
+      }
+
+      // If user disables one and currently had 3 selected, re-enable the rule
+      if (selected.length === 2 && allowThree) {
+        allowThree = false;
+      }
+    }
+
+    Object.keys(switches).forEach(id => {
+      switches[id].addEventListener("change", () => handleSwitchChange(id));
+    });
+  </script>
+</body>
+</html>
