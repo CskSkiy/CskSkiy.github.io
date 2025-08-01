@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 40px;
+      background: #f0f0f0;
+    }
+
+    h2 {
+      margin-bottom: 40px;
+    }
+
+    .switch-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .switch-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 50px;
+      height: 26px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 26px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 20px;
+      width: 20px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(24px);
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    /* Modal styles */
+    .modal {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .modal-buttons button {
+      padding: 8px 14px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .confirm-btn { background-color: #4CAF50; color: white; }
+    .cancel-btn { background-color: #f44336; color: white; }
+    .neutral-btn { background-color: #9e9e9e; color: white; }
+  </style>
+</head>
+<body>
+  <h2>選擇您的請求</h2>
+
+  <div class="switch-group">
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch1" />
+        <span class="slider"></span>
+      </label>
+      <span>品質好</span>
+    </div>
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch2" />
+        <span class="slider"></span>
+      </label>
+      <span>便宜點</span>
+    </div>
+    <div class="switch-container">
+      <label class="switch">
+        <input type="checkbox" id="switch3" />
+        <span class="slider"></span>
+      </label>
+      <span>做快點</span>
+    </div>
+  </div>
+
+  <button onclick="handleConfirm()">確認</button>
+
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div id="modal-message"></div>
+      <div class="modal-buttons" id="modal-buttons"></div>
+    </div>
+  </div>
+
+  <script>
+    const switches = {
+      switch1: document.getElementById("switch1"),
+      switch2: document.getElementById("switch2"),
+      switch3: document.getElementById("switch3"),
+    };
+
+    let allowThree = false;
+
+    function getSelected() {
+      return Object.entries(switches)
+        .filter(([_, cb]) => cb.checked)
+        .map(([id, _]) => id);
+    }
+
+    function handleSwitchChange(changedId) {
+      const selected = getSelected();
+
+      if (selected.length > 3) return; // safety check
+
+      if (selected.length === 3) {
+        if (!allowThree) {
+          // 取消除了changedId以外的其中一個已選取的 switch
+          const others = selected.filter((id) => id !== changedId);
+          const toUncheck = others[Math.floor(Math.random() * others.length)];
+          switches[toUncheck].checked = false;
+        }
+      }
+
+      // 15%機率暫時解除三選限制
+      if (selected.length === 3 && !allowThree && Math.random() < 0.15) {
+        allowThree = true;
+      }
+
+      // 如果從三選回到兩選，恢復限制
+      if (selected.length === 2 && allowThree) {
+        allowThree = false;
+      }
+    }
+
+    // 綁定事件
+    Object.keys(switches).forEach((id) => {
+      switches[id].addEventListener("change", () => handleSwitchChange(id));
+    });
+
+    // 彈窗顯示
+    function showModal(message, buttons) {
+      const modal = document.getElementById("modal");
+      const msgBox = document.getElementById("modal-message");
+      const btnBox = document.getElementById("modal-buttons");
+
+      msgBox.innerHTML = message;
+      btnBox.innerHTML = "";
+
+      buttons.forEach((btn) => {
+        const button = document.createElement("button");
+        button.textContent = btn.text;
+        button.className = btn.class;
+        button.onclick = () => {
+          modal.style.display = "none";
+          btn.onClick();
+        };
+        btnBox.appendChild(button);
+      });
+
+      modal.style.display = "flex";
+    }
+
+    // 確認按鈕邏輯
+    function handleConfirm() {
+      const selected = getSelected();
+      const labelMap = {
+        switch1: "good",
+        switch2: "cheap",
+        switch3: "fast",
+      };
+      const values = selected.map((id) => labelMap[id]);
+      const set = new Set(values);
+
+      if (selected.length === 0) {
+        showModal("感謝您。", [
+          { text: "我知道了", class: "neutral-btn", onClick: () => {} },
+        ]);
+        return;
+      }
+
+      if (selected.length === 1) {
+        showModal("我們會盡量達成您的要求 :)", [
+          { text: "我知道了", class: "neutral-btn", onClick: () => {} },
+	  { text: "我再想想", class: "cancel-btn", onClick: () => {} },
+        ]);
+        return;
+      }
+
+      if (selected.length === 2) {
+        // good + cheap
+        if (set.has("good") && set.has("cheap")) {
+          // 兩段流程多按鈕
+          let step = 1;
+          function step1() {
+            showModal("這樣要求會導致準備時間大幅拉長，你確定？", [
+              { text: "我確定", class: "confirm-btn", onClick: step2 },
+              { text: "算了吧，我取消", class: "cancel-btn", onClick: () => {} },
+            ]);
+          }
+          function step2() {
+            showModal("請您等候，我們將盡快為您處理。:)", [
+              {
+                text: "算了吧，我取消",
+                class: "cancel-btn",
+                onClick: () => {},
+              },
+              {
+                text: "我不想等，快一點",
+                class: "confirm-btn",
+                onClick: step3,
+              },
+              { text: "我知道了", class: "neutral-btn", onClick: () => {} },
+            ]);
+          }
+          function step3() {
+            showModal("你這無良甲方，要好要便宜還不願意等喔？我也等不及你早點去投胎😅🖕", [
+              {
+                text: "？",
+                class: "cancel-btn",
+                onClick: () => window.open("", "_self").close(),
+              },
+            ]);
+          }
+          step1();
+          return;
+        }
+
+        // good + fast
+        if (set.has("good") && set.has("fast")) {
+          let step = 1;
+          const price =
+            Math.floor(Math.random() * (50 - 5 + 1) + 5) * 1000; // 5000~50000千位整數
+
+          function step1() {
+            showModal(`這樣要求會導致金額大幅增加，你確定？`, [
+              { text: "我確定", class: "confirm-btn", onClick: step2 },
+              { text: "我再想想", class: "cancel-btn", onClick: () => {} },
+            ]);
+          }
+          function step2() {
+            showModal(
+              `金額為 <strong>${price.toLocaleString()}</strong>，付錢後，我們將為您處理。:)`,
+              [
+                {
+                  text: "算了吧，我取消",
+                  class: "cancel-btn",
+                  onClick: () => {},
+                },
+                {
+                  text: "我不想花這麼多錢，殺價",
+                  class: "confirm-btn",
+                  onClick: step3,
+                },
+                { text: "我知道了", class: "neutral-btn", onClick: () => {} },
+              ]
+            );
+          }
+          function step3() {
+            showModal("你這良心狗啃慣老闆，要好要快不給錢，養馬的想要馬快都知道要給草吃，就你不知道，可憐😅🖕", [
+              {
+                text: "？",
+                class: "cancel-btn",
+                onClick: () => window.open("", "_self").close(),
+              },
+            ]);
+          }
+          step1();
+          return;
+        }
+
+        // cheap + fast
+        if (set.has("cheap") && set.has("fast")) {
+          let step = 1;
+          function step1() {
+            showModal(
+              `這樣要求會導致品質大幅降低，你確定？`,
+              [
+                { text: "我確定", class: "confirm-btn", onClick: step2 },
+                { text: "我再想想", class: "cancel-btn", onClick: () => {} },
+              ]
+            );
+          }
+          function step2() {
+            showModal(`這是您選擇的 <a href="https://youtu.be/dQw4w9WgXcQ?si=5gFjDn78xSUHhbe5" target="_blank" rel="noopener noreferrer">物品</a>，請先確認。:)`, [
+              {
+                text: "算了吧，我取消",
+                class: "cancel-btn",
+                onClick: () => {},
+              },
+              { text: "我知道了", class: "neutral-btn", onClick: () => {} },
+              { text: "這也太爛了，弄好一點", class: "confirm-btn", onClick: step3 },
+            ]);
+          }
+          function step3() {
+            showModal("You cheeky fucker，要快又不給錢怕不是窮學生專案到最後一天在找人幫忙趕作業吧，哪邊涼快哪邊去😅🖕", [
+              {
+                text: "？",
+                class: "cancel-btn",
+                onClick: () => window.open("", "_self").close(),
+              },
+            ]);
+          }
+          step1();
+          return;
+        }
+      }
+
+      if (selected.length === 3) {
+        showModal("你確定要這樣要求？", [
+          {
+            text: "我確定",
+            class: "confirm-btn",
+            onClick: () => {
+              showModal("Impossible. Go to hell.😅🖕", [
+                {
+                  text: "？",
+                  class: "cancel-btn",
+                  onClick: () => window.open("", "_self").close(),
+                },
+              ]);
+            },
+          },
+          { text: "我再想想", class: "neutral-btn", onClick: () => {} },
+        ]);
+      }
+    }
+  </script>
+</body>
+</html>
