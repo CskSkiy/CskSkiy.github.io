@@ -126,6 +126,7 @@
     .confirm-btn { background-color: #4CAF50; color: white; }
     .cancel-btn { background-color: #f44336; color: white; }
     .neutral-btn { background-color: #9e9e9e; color: white; }
+}
   </style>
 </head>
 <body>
@@ -209,6 +210,17 @@
       switches[id].addEventListener("change", () => handleSwitchChange(id));
     });
 
+	function disablePage() {
+ 	 // 清空 body 內容
+	  document.body.innerHTML = "<h2>頁面已關閉，請關閉此分頁。</h2>";
+	  // 改變 body 樣式，讓游標變成禁用狀態
+	  document.body.style.cursor = "not-allowed";
+	  // 禁止滑鼠點擊和鍵盤事件
+	  document.body.style.pointerEvents = "none";
+	  // 若需要，還可以禁止滾動
+ 	 document.body.style.overflow = "hidden";
+	}
+
     // 彈窗顯示
     function showModal(message, buttons) {
       const modal = document.getElementById("modal");
@@ -289,7 +301,7 @@
               {
                 text: "？",
                 class: "cancel-btn",
-                onClick: () => window.open("", "_self").close(),
+                onClick: disablePage,
               },
             ]);
           }
@@ -332,7 +344,7 @@
               {
                 text: "？",
                 class: "cancel-btn",
-                onClick: () => window.open("", "_self").close(),
+                onClick: disablePage,
               },
             ]);
           }
@@ -364,11 +376,11 @@
             ]);
           }
           function step3() {
-            showModal("You cheeky fucker，要快又不給錢怕不是窮學生專案到最後一天在找人幫忙趕作業吧，哪邊涼快哪邊去😅🖕", [
+            showModal("Cheeky fucker，要快又不給錢怕不是窮學生專案到最後一天在找人幫忙趕作業吧，哪邊涼快哪邊去😅🖕", [
               {
                 text: "？",
                 class: "cancel-btn",
-                onClick: () => window.open("", "_self").close(),
+                onClick: disablePage,
               },
             ]);
           }
@@ -387,7 +399,7 @@
                 {
                   text: "？",
                   class: "cancel-btn",
-                  onClick: () => window.open("", "_self").close(),
+                  onClick: disablePage,
                 },
               ]);
             },
