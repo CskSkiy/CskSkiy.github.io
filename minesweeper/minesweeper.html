@@ -3,18 +3,122 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>XP Minesweeper</title>
+<title>Minesweeper</title>
 <style>
-body{margin:0;background:#c0c0c0;font-family:Tahoma,sans-serif;display:flex;justify-content:center;align-items:center;min-height:100vh}
-.hidden{display:none!important}.screen{text-align:center}
-.panel{background:#c0c0c0;padding:10px;border-top:3px solid #fff;border-left:3px solid #fff;border-right:3px solid #808080;border-bottom:3px solid #808080}
-button{cursor:pointer}.menu button{display:block;width:260px;margin:10px auto;padding:10px}
-#game{display:none}.top{display:flex;gap:10px;align-items:center;justify-content:space-between;padding:8px;margin-bottom:8px;border-top:2px solid #808080;border-left:2px solid #808080;border-right:2px solid #fff;border-bottom:2px solid #fff}
-.counter{background:#000;color:#f00;font:28px Consolas,monospace;padding:4px 8px;min-width:70px;text-align:center}
-#face{width:42px;height:42px;font-size:24px;background:#c0c0c0;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080}
-#board{display:grid;padding:4px;border-top:3px solid #808080;border-left:3px solid #808080;border-right:3px solid #fff;border-bottom:3px solid #fff}
-.cell{width:24px;height:24px;background:#c0c0c0;display:flex;align-items:center;justify-content:center;font-weight:bold;user-select:none;border-top:2px solid #fff;border-left:2px solid #fff;border-right:2px solid #808080;border-bottom:2px solid #808080}
-.open{border:1px solid #999}.num1{color:#00f}.num2{color:#008200}.num3{color:#f00}.num4{color:#000084}.num5{color:#840000}.num6{color:#008284}.num7{color:#000}.num8{color:#808080}
+body{
+    margin:0;
+    background:#c0c0c0;
+    font-family:Tahoma,sans-serif;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh
+}
+.hidden{
+    display:none!important
+}
+.screen{
+    text-align:center
+}
+.panel{
+    background:#c0c0c0;
+    padding:10px;
+    border-top:3px solid #fff;
+    border-left:3px solid #fff;
+    border-right:3px solid #808080;
+    border-bottom:3px solid #808080
+}
+button{
+    cursor:pointer
+}
+.menu button{
+    display:block;
+    width:260px;
+    margin:10px auto;
+    padding:10px
+}
+#game{
+    display:none
+}
+.top{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    justify-content:space-between;
+    padding:8px;
+    margin-bottom:8px;
+    border-top:2px solid #808080;
+    border-left:2px solid #808080;
+    border-right:2px solid #fff;
+    border-bottom:2px solid #fff
+}
+.counter{
+    background:#000;
+    color:#f00;
+    font:28px Consolas,monospace;
+    padding:4px 8px;
+    min-width:70px;
+    text-align:center
+}
+#face{
+    width:42px;
+    height:42px;
+    font-size:24px;
+    background:#c0c0c0;
+    border-top:2px solid #fff;
+    border-left:2px solid #fff;
+    border-right:2px solid #808080;
+    border-bottom:2px solid #808080
+}
+#board{
+    display:grid;
+    padding:4px;
+    border-top:3px solid #808080;
+    border-left:3px solid #808080;
+    border-right:3px solid #fff;
+    border-bottom:3px solid #fff
+}
+.cell{
+    width:24px;height:24px;
+    background:#c0c0c0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+    user-select:none;
+    border-top:2px solid #fff;
+    border-left:2px solid #fff;
+    border-right:2px solid #808080;
+    border-bottom:2px solid #808080
+}
+.open{
+    border:1px solid #999
+}
+.num1{
+    color:#00f
+}
+.num2{
+    color:#008200
+}
+.num3{
+    color:#f00
+}
+.num4{
+    color:#000084
+}
+.num5{
+    color:#840000
+}
+.num6{
+    color:#008284
+}
+.num7{
+    color:#000
+}
+.num8{
+    color:#808080
+}
+
 </style>
 </head><body>
 <div id='menu' class='screen panel menu'><h1>💣 Minesweeper</h1><button onclick="startGame('easy')">初級 9×9 / 10雷</button><button onclick="startGame('medium')">中級 16×16 / 40雷</button><button onclick="startGame('hard')">高級 30×16 / 99雷</button></div>
@@ -26,56 +130,40 @@ function startGame(l){level=l;[rows,cols,mines]=CFG[l];opened=0;first=true;gameO
 const boardEl=(r,c)=>board.children[r*cols+c];
 function placeSafe(fr,fc){let safe=new Set();for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){let nr=fr+dr,nc=fc+dc;if(nr>=0&&nr<rows&&nc>=0&&nc<cols)safe.add(nr+','+nc)}let p=0;while(p<mines){let r=Math.floor(Math.random()*rows),c=Math.floor(Math.random()*cols);if(safe.has(r+','+c)||b[r][c].mine)continue;b[r][c].mine=1;p++;}for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){if(b[r][c].mine)continue;let n=0;for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){let nr=r+dr,nc=c+dc;if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&b[nr][nc].mine)n++;}b[r][c].num=n;}}
 function showResult(win){
-
     gameOver = true;
-
     clearInterval(timer);
-
     const modal =
         document.getElementById("resultModal");
-
     const title =
         document.getElementById("resultTitle");
-
     const message =
         document.getElementById("resultMessage");
-
     if(win){
-
         title.textContent =
             "😎 Victory";
-
         message.innerHTML =
             `
             通關時間：${sec} 秒<br>
             恭喜完成挑戰！
             `;
-
     }else{
-
         title.textContent =
             "😵 Game Over";
-
         message.innerHTML =
             `
             你踩到地雷了！
             `;
     }
-
     modal.style.display="flex";
 }
 function backToMenu(){
-
     clearInterval(timer);
-
     document
         .getElementById("resultModal")
         .style.display = "none";
-
     document
         .getElementById("game")
         .style.display = "none";
-
     document
         .getElementById("menu")
         .classList
@@ -85,13 +173,9 @@ function startTimer(){timer=setInterval(()=>{sec++;time.textContent=pad(sec)},10
 function minesEl(){document.getElementById('mines').textContent=pad(remain)}
 function mark(r,c){if(gameOver||b[r][c].open)return;let x=b[r][c],e=boardEl(r,c);if(x.mark===0){x.mark=1;e.textContent='🚩';remain--;}else if(x.mark===1){x.mark=2;e.textContent='❓';remain++;}else{x.mark=0;e.textContent='';}minesEl();}
 function openCell(r,c){if(gameOver)return;let x=b[r][c];if(x.open||x.mark===1)return;if(first){first=false;placeSafe(r,c);startTimer();}x.open=1;let e=boardEl(r,c);e.classList.add('open');if(x.mine){face.textContent='😵';
-
 reveal();
-
 showResult(false);
-
 return;}opened++;if(x.num){e.textContent=x.num;e.classList.add('num'+x.num);}else for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){let nr=r+dr,nc=c+dc;if(nr>=0&&nr<rows&&nc>=0&&nc<cols&&!b[nr][nc].open)openCell(nr,nc);}if(opened===rows*cols-mines){face.textContent='😎';
-
 let best='best_'+level;
 
 let v=localStorage.getItem(best);
@@ -112,7 +196,9 @@ function restartGame(){
 
     startGame(level);
 }
-</script><!-- RESULT MODAL -->
+</script>
+
+<!-- RESULT MODAL -->
 <div id="resultModal" style="
 display:none;
 position:fixed;
@@ -158,9 +244,8 @@ z-index:999;
             <button onclick="backToMenu()">
                 📋 難度選擇
             </button>
-
         </div>
-
     </div>
-
-</div></body></html>
+</div>
+</body>
+</html>
